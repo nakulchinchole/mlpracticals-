@@ -1,0 +1,98 @@
+# STEP 1: Import Libraries
+import os
+import numpy as np
+import pandas as pd
+from sklearn.preprocessing import LabelEncoder, StandardScaler
+
+# STEP 2: Check Current Working Directory
+os.getcwd()
+
+# STEP 3: List Files
+os.listdir()
+
+# STEP 4: Load Dataset
+df = pd.read_csv('Downloads/Time table/ml books/adult.csv')   (dataset saved in clg pc filepath)
+
+# STEP 5: Display First Five Rows
+df.head()
+
+# STEP 6: Dataset Shape
+df.shape
+
+# STEP 7: Column Names
+df.columns
+
+# STEP 8: Dataset Information
+df.info()
+
+# STEP 9: Statistical Summary
+df.describe()
+
+# STEP 10: Check Unique Values
+df['workclass'].unique()
+
+# STEP 11: Replace '?' with NaN
+df.replace('?', np.nan, inplace=True)
+
+# STEP 12: Check Missing Values
+df.isnull().sum()
+
+# STEP 13: Total Missing Values
+df.isnull().sum().sum()
+
+# STEP 14: Missing Percentage
+(df.isnull().sum() / len(df)) * 100
+
+# STEP 15: Find Mode
+df['workclass'].mode()
+df['occupation'].mode()
+df['native-country'].mode()
+
+# STEP 16: Fill Missing Values
+df['workclass'].fillna(df['workclass'].mode()[0], inplace=True)
+df['occupation'].fillna(df['occupation'].mode()[0], inplace=True)
+df['native-country'].fillna(df['native-country'].mode()[0], inplace=True)
+
+# STEP 17: Verify Missing Values
+df.isnull().sum()
+
+# STEP 18: Identify Categorical Columns
+df.select_dtypes(include='object').columns
+
+# STEP 19: Create Label Encoder
+encoder = LabelEncoder()
+
+# STEP 20: Encode Categorical Columns
+for col in df.select_dtypes(include='object').columns:
+    df[col] = encoder.fit_transform(df[col])
+
+# STEP 21: Verify Encoding
+df['gender'].unique()
+df.head()
+
+# STEP 22: Create Scaler
+scaler = StandardScaler()
+
+# STEP 23: Scale Dataset
+df_scaled = pd.DataFrame(
+    scaler.fit_transform(df),
+    columns=df.columns
+)
+
+# STEP 24: View Scaled Data
+df_scaled.head()
+
+# STEP 25: Check Mean
+df_scaled.mean()
+
+# STEP 26: Check Standard Deviation
+df_scaled.std()
+
+# STEP 27: Save Processed Dataset
+df_scaled.to_csv('adult_preprocessed.csv', index=False)
+
+# STEP 28: Display Final Dataset
+df_scaled.head()
+
+# STEP 29: Check Final Dataset Shape
+df_scaled.shape
