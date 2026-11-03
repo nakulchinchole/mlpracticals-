@@ -1,0 +1,190 @@
+# 1. Import Libraries
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import time
+
+from sklearn.datasets import load_digits
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score
+
+# 2. Load Dataset
+digits = load_digits()
+
+# 3. Display a Real Digit Image
+plt.imshow(digits.images[0], cmap='gray')
+plt.title(f"Digit: {digits.target[0]}")
+plt.axis('off')
+plt.show()
+
+# 4. View Pixel Values
+print(digits.images[0])
+
+# 5. Convert Image Data into Features and Target
+X = digits.data
+y = digits.target
+
+print("X shape:", X.shape)
+print("y shape:", y.shape)
+
+# 6. Split Dataset into Training and Testing Data
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.2,
+    random_state=42,
+    stratify=y
+)
+
+# Check Shapes
+print("X_train shape:", X_train.shape)
+print("X_test shape:", X_test.shape)
+print("y_train shape:", y_train.shape)
+print("y_test shape:", y_test.shape)
+
+# 7. Feature Scaling
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+# 8. Baseline Model using Original 64 Features
+# Create Logistic Regression Model
+model_original = LogisticRegression(
+    max_iter=1000,
+    random_state=42
+)
+
+# Train and Measure Time
+start_time = time.time()
+model_original.fit(X_train_scaled, y_train)
+training_time_original = time.time() - start_time
+print("Original Training time:",
+      training_time_original, "seconds")
+
+# Prediction
+y_pred_original = model_original.predict(X_test_scaled)
+
+
+# Calculate Accuracy
+accuracy_original = accuracy_score(
+    y_test,
+    y_pred_original
+)
+print("Original Features Accuracy:",
+      accuracy_original)
+
+# 9. Apply PCA
+# Create PCA Object
+pca = PCA(n_components=2)
+
+# Fit PCA and Transform Training Data
+X_train_pca = pca.fit_transform(X_train_scaled)
+
+# Transform Test Data
+X_test_pca = pca.transform(X_test_scaled)
+
+
+# Check Dimensions
+print("Original X_train shape:", X_train_scaled.shape)
+print("PCA X_train shape:", X_train_pca.shape)
+
+print("Original X_test shape:", X_test_scaled.shape)
+print("PCA X_test shape:", X_test_pca.shape)
+
+# 10. Logistic Regression on PCA Data
+# Create Model
+model_pca = LogisticRegression(
+    max_iter=1000,
+    random_state=42
+)
+
+# Train and Measure Time
+start_time = time.time()
+model_pca.fit(X_train_pca, y_train)
+training_time_pca = time.time() - start_time
+print("PCA Training time:",
+      training_time_pca, "seconds")
+
+# Prediction
+y_pred_pca = model_pca.predict(X_test_pca)
+
+# Calculate Accuracy
+accuracy_pca = accuracy_score(
+    y_test,
+    y_pred_pca
+)
+
+print("PCA Accuracy:",
+      accuracy_pca * 100, "%")
+
+
+# 11. Apply LDA
+# Create LDA Object
+lda = LinearDiscriminantAnalysis(
+    n_components=9
+)
+
+# Fit and Transform Training Data
+X_train_lda = lda.fit_transform(
+    X_train_scaled,
+    y_train
+)
+
+# Transform Test Data
+X_test_lda = lda.transform(X_test_scaled)
+
+# Check Dimensions
+print("Original X_train shape:", X_train_scaled.shape)
+print("LDA X_train shape:", X_train_lda.shape)
+
+print("Original X_test shape:", X_test_scaled.shape)
+print("LDA X_test shape:", X_test_lda.shape)
+
+
+# 12. Logistic Regression on LDA Data
+# Create Model
+model_lda = LogisticRegression(
+    max_iter=1000,
+    random_state=42
+)
+
+# Train the Model
+start_time = time.time()
+model_lda.fit(X_train_lda, y_train)
+training_time_lda = time.time() - start_time
+print("LDA Training time:",
+      training_time_lda, "seconds")
+
+
+# Prediction
+y_pred_lda = model_lda.predict(X_test_lda)
+
+
+# Calculate Accuracy
+accuracy_lda = accuracy_score(
+    y_test,
+    y_pred_lda
+)
+print("LDA Accuracy:",
+      accuracy_lda * 100, "%")
+
+# 13. Final Comparison
+print("\n----- FINAL COMPARISON -----")
+print("Original Features:")
+print("Features:", X_train_scaled.shape[1])
+print("Accuracy:", accuracy_original * 100, "%")
+print("Training Time:", training_time_original, "seconds")
+
+print("\nPCA:")
+print("Features:", X_train_pca.shape[1])
+print("Accuracy:", accuracy_pca * 100, "%")
+print("Training Time:", training_time_pca, "seconds")
+
+print("\nLDA:")
+print("Features:", X_train_lda.shape[1])
+print("Accuracy:", accuracy_lda * 100, "%")
+print("Training Time:", training_time_lda, "seconds")
